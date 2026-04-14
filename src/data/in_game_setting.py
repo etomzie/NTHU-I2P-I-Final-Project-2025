@@ -1,8 +1,3 @@
-'''
-[TODO HACKATHON 5]
-Try to mimic the menu_scene.py or game_scene.py to create this new scene
-'''
-
 import pygame as pg
 
 from src.utils import GameSettings
@@ -15,20 +10,17 @@ from src.sprites import Sprite
 from src.utils.settings import GameSettings
 
 
-class SettingScene(Scene):
-    # Background Image
-    background: BackgroundSprite
-    # Buttons
-    return_button: Button
-    
+
+
+
+class inGameSetting(Scene):    
     def __init__(self):
         super().__init__()
-        self.background = BackgroundSprite("backgrounds/background1.png")
         px, py = GameSettings.SCREEN_WIDTH // 2, GameSettings.SCREEN_HEIGHT * 3 // 4
         self.return_button = Button(
-            "UI/button_back.png", "UI/button_back_hover.png",
-            px - 270, py - 40, 75, 75,
-            lambda: scene_manager.change_scene("menu")
+            "UI/button_x.png", "UI/button_x_hover.png",
+            GameSettings.SCREEN_WIDTH * 3 // 4 - 75, GameSettings.SCREEN_HEIGHT // 5 - 10, 30, 30,
+            lambda: scene_manager._current_scene.bag_close()
         )
         
         self.state_muted = 0
@@ -48,6 +40,25 @@ class SettingScene(Scene):
             375, 260, 40, 20,
             self.slider_hold
         )
+        
+        
+        self.save_button = Button(
+            "UI/button_save.png", "UI/button_save_hover.png",
+            375, 450, 70, 70,
+            
+            lambda: scene_manager._current_scene.game_manager.save("saves/game0.json")
+        )
+        
+        self.load_button = Button(
+            "UI/button_load.png", "UI/button_load_hover.png",
+            460, 450, 70, 70,
+            lambda: scene_manager._current_scene.load_save()
+        )
+        
+        
+        
+    
+        
     
     def slider_hold(self):
         #print("asfas")
@@ -73,6 +84,8 @@ class SettingScene(Scene):
         self.return_button.update(dt)
         self.mute_button.update(dt)
         self.slider_button.update(dt)
+        self.save_button.update(dt)
+        self.load_button.update(dt)
         
         if self.vol_slider_hold and input_manager.mouse_down(1):
             self.slider_button.hitbox.x = input_manager.mouse_pos[0]
@@ -88,7 +101,7 @@ class SettingScene(Scene):
         
             
         if input_manager.key_pressed(27):
-            scene_manager.change_scene("menu")
+            scene_manager._current_scene.bag_close()
         #print(input_manager._pressed_mouse, input_manager._released_mouse, input_manager._down_mouse)
 
 
@@ -96,7 +109,6 @@ class SettingScene(Scene):
     def draw(self, screen: pg.Surface) -> None:
         WIDTH = GameSettings.SCREEN_WIDTH
         HEIGHT = GameSettings.SCREEN_HEIGHT
-        self.background.draw(screen)
         
         pg.font.init()
         fonts = pg.font.Font("assets/fonts/Minecraft.ttf", 20)
@@ -133,12 +145,15 @@ class SettingScene(Scene):
         screen.blit(mute_txt, (375, 300))
         
         esc_txt = fonts.render('Press ESC to close', False, (0, 0, 0))
-        screen.blit(esc_txt, (465, 535))
+        screen.blit(esc_txt, (375, 565))
         
         
         self.mute_button.draw(screen)
         self.slider_button.draw(screen)
         self.return_button.draw(screen)
+        self.save_button.draw(screen)
+        self.load_button.draw(screen)
+        
 
 
 

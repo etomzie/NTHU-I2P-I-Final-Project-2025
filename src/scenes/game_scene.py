@@ -5,8 +5,10 @@ import time
 from src.scenes.scene import Scene
 from src.core import GameManager, OnlineManager
 from src.utils import Logger, PositionCamera, GameSettings, Position
-from src.core.services import sound_manager
+from src.core.services import sound_manager, scene_manager
 from src.sprites import Sprite
+from src.interface.components import Button
+from src.data.in_game_setting import inGameSetting
 
 from typing import override, Dict, Tuple
 # from src.interface.components.chat_overlay import ChatOverlay
@@ -16,16 +18,19 @@ class GameScene(Scene):
     online_manager: OnlineManager | None
     sprite_online: Sprite
     
+    curr_state: str
+    
     def __init__(self):
         super().__init__()
         # Game Manager
-        manager = GameManager.load("saves/game0.json")
+        manager = GameManager.load("saves/game0.json") 
         if manager is None:
             Logger.error("Failed to load game manager")
             exit(1)
         self.game_manager = manager
-        
-        # Online Manager
+        self.curr_state = "playing"
+
+        # Online Managerd
         if GameSettings.IS_ONLINE:
             self.online_manager = OnlineManager()
             # self.chat_overlay = ChatOverlay(
@@ -37,6 +42,34 @@ class GameScene(Scene):
         self.sprite_online = Sprite("ingame_ui/options1.png", (GameSettings.TILE_SIZE, GameSettings.TILE_SIZE))
         self._chat_bubbles: Dict[int, Tuple[str, str]] = {}
         self._last_chat_id_seen = 0
+        
+        
+        self.bag_button = Button(
+            "UI/button_backpack.png", "UI/button_backpack_hover.png",
+            GameSettings.SCREEN_WIDTH - 150 - 75 - 10, 60, 75, 75,
+            lambda: self.bag_overlay()
+        )
+        self.setting_button = Button(
+            "UI/button_setting.png", "UI/button_setting_hover.png",
+            GameSettings.SCREEN_WIDTH - 150, 60, 75, 75,
+            lambda: self.setting_overlay()
+        )
+        
+    def load_save(self):
+        self.game_manager = scene_manager._current_scene.game_manager.load("saves/game0.json")
+        
+    def setting_overlay(self):
+        if self.curr_state == "playing":
+            self.curr_state = "setting"
+    
+    def bag_overlay(self):
+        if self.curr_state == "playing":
+            self.curr_state = "bag"
+        
+    def bag_close(self):
+        self.curr_state = "playing"        
+        
+        
 
     @override
     def enter(self) -> None:
@@ -51,7 +84,12 @@ class GameScene(Scene):
         
     @override
     def update(self, dt: float):
+        #print(self.curr_state)
         # Check if there is assigned next scene
+        self.bag_button.update(dt)
+        self.setting_button.update(dt)
+        
+        
         self.game_manager.try_switch_map()
         
         # Update player and other data
@@ -62,6 +100,7 @@ class GameScene(Scene):
             
         # Update others
         self.game_manager.bag.update(dt)
+        self.game_manager.setting.update(dt)
 
         """
         TODO: UPDATE CHAT OVERLAY:
@@ -100,7 +139,9 @@ class GameScene(Scene):
             )
         
     @override
-    def draw(self, screen: pg.Surface):        
+    def draw(self, screen: pg.Surface):  
+        
+        
         if self.game_manager.player:
             '''
             [TODO HACKATHON 3]
@@ -110,8 +151,15 @@ class GameScene(Scene):
             
             camera = self.game_manager.player.camera
             '''
-            camera = PositionCamera(16 * GameSettings.TILE_SIZE, 30 * GameSettings.TILE_SIZE)
+            camera = self.game_manager.player.camera
+            camera.x -= GameSettings.SCREEN_WIDTH // 2 - GameSettings.TILE_SIZE // 2
+            camera.y -= GameSettings.SCREEN_HEIGHT // 2 - GameSettings.TILE_SIZE // 2
+            
+            
+            #camera = PositionCamera(16 * GameSettings.TILE_SIZE, 30 * GameSettings.TILE_SIZE)
             self.game_manager.current_map.draw(screen, camera)
+            
+            
             self.game_manager.player.draw(screen, camera)
         else:
             camera = PositionCamera(0, 0)
@@ -119,7 +167,7 @@ class GameScene(Scene):
         for enemy in self.game_manager.current_enemy_trainers:
             enemy.draw(screen, camera)
 
-        self.game_manager.bag.draw(screen)
+
 
         # if self._chat_overlay:
         #     self._chat_overlay.draw(screen)
@@ -136,6 +184,20 @@ class GameScene(Scene):
             #     self._draw_chat_bubbles(...)
             # except Exception:
             #     pass
+        
+        
+        self.bag_button.draw(screen)  
+        self.setting_button.draw(screen)
+        
+        if self.curr_state == "bag":
+            self.game_manager.bag.draw(screen)
+        elif self.curr_state == "setting":
+            self.game_manager.setting.draw(screen)
+                     
+
+            
+    
+    
     def _draw_chat_bubbles(self, screen: pg.Surface, camera: PositionCamera) -> None:
         
         # if not self.online_manager:

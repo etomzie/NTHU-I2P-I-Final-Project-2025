@@ -3,6 +3,7 @@ from .settings import GameSettings
 from dataclasses import dataclass
 from enum import Enum
 from typing import overload, TypedDict, Protocol
+#from typing import overload, TypedDict, Protocol
 
 MouseBtn = int
 Key = int

@@ -4,6 +4,8 @@ import json, os
 import pygame as pg
 from typing import TYPE_CHECKING
 
+from src.data.in_game_setting import inGameSetting
+
 if TYPE_CHECKING:
     from src.maps.map import Map
     from src.entities.player import Player
@@ -23,6 +25,7 @@ class GameManager:
     # Changing Scene properties
     should_change_scene: bool
     next_map: str
+    setting: inGameSetting()
     
     def __init__(self, maps: dict[str, Map], start_map: str, 
                  player: Player | None,
@@ -36,6 +39,7 @@ class GameManager:
         self.player = player
         self.enemy_trainers = enemy_trainers
         self.bag = bag if bag is not None else Bag([], [])
+        self.setting = inGameSetting()
         
         # Check If you should change scene
         self.should_change_scene = False
@@ -67,7 +71,10 @@ class GameManager:
             self.next_map = ""
             self.should_change_scene = False
             if self.player:
-                self.player.position = self.maps[self.current_map_key].spawn
+                print(f"Switching to map {self.current_map_key} at spawn {self.maps[self.current_map_key].spawn.x // GameSettings.TILE_SIZE}, {self.maps[self.current_map_key].spawn.y // GameSettings.TILE_SIZE} from {self.player.position.x // GameSettings.TILE_SIZE}, {self.player.position.y // GameSettings.TILE_SIZE}")
+                
+                self.player.position = Position(self.maps[self.current_map_key].spawn.x, self.maps[self.current_map_key].spawn.y)
+                #self.player.position = self.maps[self.current_map_key].spawn
             
     def check_collision(self, rect: pg.Rect) -> bool:
         if self.maps[self.current_map_key].check_collision(rect):
@@ -77,7 +84,7 @@ class GameManager:
                 return True
         
         return False
-        
+
     def save(self, path: str) -> None:
         try:
             with open(path, "w") as f:
@@ -88,6 +95,7 @@ class GameManager:
              
     @classmethod
     def load(cls, path: str) -> "GameManager | None":
+        
         if not os.path.exists(path):
             Logger.error(f"No file found: {path}, ignoring load function")
             return None

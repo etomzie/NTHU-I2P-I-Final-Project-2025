@@ -8,7 +8,7 @@ This Project is inspired by classic pokemon game
 1. (Recommended) Install Python 3.12.x (We use 3.12.8) from the official Python website and create virtual environment
     ```bash
     # On mac/linux
-    python3.12 -m venv venv
+    python3.11 -m venv venv
     # or
     python3 -m venv venv
     # On Windows 

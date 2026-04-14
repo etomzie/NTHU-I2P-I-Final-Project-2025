@@ -10,6 +10,8 @@ from src.core import GameManager
 from src.core.services import input_manager, scene_manager
 from src.utils import GameSettings, Direction, Position, PositionCamera
 
+import time
+
 
 class EnemyTrainerClassification(Enum):
     STATIONARY = "stationary"
@@ -50,13 +52,19 @@ class EnemyTrainer(Entity):
         self.warning_sign = Sprite("exclamation.png", (GameSettings.TILE_SIZE // 2, GameSettings.TILE_SIZE // 2))
         self.warning_sign.update_pos(Position(x + GameSettings.TILE_SIZE // 4, y - GameSettings.TILE_SIZE // 2))
         self.detected = False
+        
+    
+    def transition_animation(self):
+        #time.sleep(1)
+        pass
 
     @override
     def update(self, dt: float) -> None:
         self._movement.update(self, dt)
         self._has_los_to_player()
         if self.detected and input_manager.key_pressed(pygame.K_SPACE):
-            pass
+            self.transition_animation()
+            scene_manager.change_scene('battle')
         self.animation.update_pos(self.position)
 
     @override
@@ -85,6 +93,28 @@ class EnemyTrainer(Entity):
         '''
         TODO: Create hitbox to detect line of sight of the enemies towards the player
         '''
+        if self.los_direction == Direction.RIGHT:
+            return pygame.Rect(self.position.x, self.position.y,
+                            GameSettings.TILE_SIZE * self.max_tiles,
+                            GameSettings.TILE_SIZE
+                               )
+        elif self.los_direction == Direction.LEFT:
+            return pygame.Rect(self.position.x - GameSettings.TILE_SIZE * self.max_tiles, self.position.y,
+                            GameSettings.TILE_SIZE * self.max_tiles,
+                            GameSettings.TILE_SIZE
+                            )    
+        elif self.los_direction == Direction.DOWN:
+            return pygame.Rect(self.position.x, self.position.y,
+                            GameSettings.TILE_SIZE,
+                            GameSettings.TILE_SIZE + GameSettings.TILE_SIZE * self.max_tiles
+                            )         
+        elif self.los_direction == Direction.UP:
+            return pygame.Rect(self.position.x, 
+                               self.position.y - GameSettings.TILE_SIZE * self.max_tiles,
+                            GameSettings.TILE_SIZE,
+                            GameSettings.TILE_SIZE + GameSettings.TILE_SIZE * self.max_tiles
+                            )   
+
         return None
 
     def _has_los_to_player(self) -> None:
@@ -100,7 +130,10 @@ class EnemyTrainer(Entity):
         TODO: Implement line of sight detection
         If it's detected, set self.detected to True
         '''
-        self.detected = False
+        if los_rect.colliderect(player.animation.rect):
+            self.detected = True
+        else:
+            self.detected = False
 
     @classmethod
     @override
