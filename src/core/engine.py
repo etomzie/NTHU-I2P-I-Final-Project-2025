@@ -7,6 +7,7 @@ from src.scenes.menu_scene import MenuScene
 from src.scenes.game_scene import GameScene
 from src.scenes.setting_scene import SettingScene
 from src.scenes.battle_scene import BattleScene
+from src.scenes.bush_scene import BushScene
 
 class Engine:
 
@@ -29,13 +30,14 @@ class Engine:
         scene_manager.register_scene("game", GameScene())
         scene_manager.register_scene("setting", SettingScene())
         scene_manager.register_scene("battle", BattleScene())
+        scene_manager.register_scene("bush", BushScene())
         '''
         [TODO HACKATHON 5]
         Register the setting scene here
         '''
         
         
-        scene_manager.change_scene("battle")
+        scene_manager.change_scene("menu")
 
     def run(self):
         Logger.info("Running the Game Loop ...")

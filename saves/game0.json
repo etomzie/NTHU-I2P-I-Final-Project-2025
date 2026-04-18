@@ -35,6 +35,12 @@
           "facing": "UP",
           "max_tiles": 2
         }
+      ],
+      "bushes":[
+        {
+          "x": 8.0,
+          "y": 30.0
+        }
       ]
     },
     {
@@ -60,57 +66,64 @@
         "x": 12,
         "y": 12
       },
-      "enemy_trainers": []
+      "enemy_trainers": [],
+      "bushes": []
     }
   ],
   "current_map": "map.tmx",
   "player": {
-    "x": 12.522629867976509,
-    "y": 28.934174172530543
+    "x": 8.995649203960289,
+    "y": 30.046515585177517
   },
   "bag": {
     "monsters": [
       {
         "name": "Pikachu",
-        "hp": 85,
+        "hp": 100,
         "max_hp": 100,
         "level": 25,
-        "sprite_path": "menu_sprites/menusprite1.png"
+        "sprite_path": "menu_sprites/menusprite1.png",
+        "damage": 45
       },
       {
         "name": "Charizard",
         "hp": 150,
         "max_hp": 200,
         "level": 36,
-        "sprite_path": "menu_sprites/menusprite2.png"
+        "sprite_path": "menu_sprites/menusprite2.png",
+        "damage": 99
       },
       {
         "name": "Blastoise",
         "hp": 120,
         "max_hp": 180,
         "level": 32,
-        "sprite_path": "menu_sprites/menusprite3.png"
+        "sprite_path": "menu_sprites/menusprite3.png",
+        "damage": 75
       },
       {
         "name": "Venusaur",
         "hp": 90,
         "max_hp": 160,
         "level": 30,
-        "sprite_path": "menu_sprites/menusprite4.png"
+        "sprite_path": "menu_sprites/menusprite4.png",
+        "damage": 34
       },
       {
         "name": "Gengar",
         "hp": 110,
         "max_hp": 140,
         "level": 28,
-        "sprite_path": "menu_sprites/menusprite5.png"
+        "sprite_path": "menu_sprites/menusprite5.png",
+        "damage": 55
       },
       {
         "name": "Dragonite",
         "hp": 180,
         "max_hp": 220,
         "level": 40,
-        "sprite_path": "menu_sprites/menusprite6.png"
+        "sprite_path": "menu_sprites/menusprite6.png",
+        "damage": 75
       }
     ],
     "items": [

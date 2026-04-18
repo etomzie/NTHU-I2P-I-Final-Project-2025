@@ -11,7 +11,7 @@ from src.core.managers.game_manager import GameManager
 from src.data.bag import Bag
 from src.entities.in_scene_enemy import InSceneEnemy
 
-class BattleScene(Scene):
+class BushScene(Scene):
     def __init__(self, ):
         super().__init__()
         self.background = BackgroundSprite("backgrounds/background1.png")
@@ -71,6 +71,9 @@ class BattleScene(Scene):
     def return_to_game(self):
         # TODO sync bag
         #scene_manager._current_scene.game_manager.save("saves/game0.json") 
+        
+
+
         scene_manager.change_scene('game')
 
 

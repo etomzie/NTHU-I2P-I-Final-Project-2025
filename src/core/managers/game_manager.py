@@ -25,12 +25,15 @@ class GameManager:
     # Changing Scene properties
     should_change_scene: bool
     next_map: str
-    setting: inGameSetting()
+    setting: inGameSetting
+
+    
     
     def __init__(self, maps: dict[str, Map], start_map: str, 
                  player: Player | None,
                  enemy_trainers: dict[str, list[EnemyTrainer]], 
-                 bag: Bag | None = None):
+                 bag: Bag | None = None,
+                 ):
                      
         from src.data.bag import Bag
         # Game Properties
@@ -40,11 +43,16 @@ class GameManager:
         self.enemy_trainers = enemy_trainers
         self.bag = bag if bag is not None else Bag([], [])
         self.setting = inGameSetting()
-        
+
+
         # Check If you should change scene
         self.should_change_scene = False
         self.next_map = ""
+
+
+    
         
+
     @property
     def current_map(self) -> Map:
         return self.maps[self.current_map_key]
@@ -56,6 +64,7 @@ class GameManager:
     @property
     def current_teleporter(self) -> list[Teleport]:
         return self.maps[self.current_map_key].teleporters
+    
     
     def switch_map(self, target: str) -> None:
         if target not in self.maps:
@@ -104,11 +113,31 @@ class GameManager:
             data = json.load(f)
         return cls.from_dict(data)
 
+    def current_bushes(self):
+        with open("saves/game0.json", "r") as f:
+            data = json.load(f)
+
+        bushes = set()
+
+        for raw in data["map"]:
+            if not raw["bushes"]: continue
+            if raw["path"] == self.current_map_key:
+                for now in raw["bushes"]:
+                    
+                    bushes.add((now["x"], now["y"]))
+                break
+
+        return bushes
+
     def to_dict(self) -> dict[str, object]:
         map_blocks: list[dict[str, object]] = []
         for key, m in self.maps.items():
             block = m.to_dict()
             block["enemy_trainers"] = [t.to_dict() for t in self.enemy_trainers.get(key, [])]
+            block["bushes"] = []
+            pos = self.current_bushes()
+            for x, y in pos:
+                block["bushes"].append({"x": x, "y": y})
             map_blocks.append(block)
         return {
             "map": map_blocks,
@@ -160,5 +189,6 @@ class GameManager:
         Logger.info("Loading bag")
         from src.data.bag import Bag as _Bag
         gm.bag = Bag.from_dict(data.get("bag", {})) if data.get("bag") else _Bag([], [])
+
 
         return gm

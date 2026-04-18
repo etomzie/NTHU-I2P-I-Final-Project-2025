@@ -9,9 +9,11 @@ class SceneManager:
     _current_scene: Scene | None = None
     _next_scene: str | None = None
     
+    
     def __init__(self):
         Logger.info("Initializing SceneManager")
         self._scenes = {}
+        self.bushes = set()
         
     def register_scene(self, name: str, scene: Scene) -> None:
         self._scenes[name] = scene
@@ -35,6 +37,8 @@ class SceneManager:
     def draw(self, screen: pg.Surface) -> None:
         if self._current_scene:
             self._current_scene.draw(screen)
+
+        
             
     def _perform_scene_switch(self) -> None:
         if self._next_scene is None:
